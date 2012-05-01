@@ -1,16 +1,20 @@
 // JSLint settings:
 /*global alert, console, Handlebars, jQuery, Zepto*/
 
-//
-// Module pattern:
-// http://yuiblog.com/blog/2007/06/12/module-pattern
-//
-var APP = (function(window, document, undefined) {
+// JS Module Pattern:
+// http://j.mp/module-pattern
+
+// Redefine: $, window, document, undefined.
+var APP = (function($, window, document, undefined) {
+  // Fire things off, once the DOM is ready.
+  $(document).ready(function() {
+    APP.go();
+  });
+
   // Empty vars. Assigned after DOM is ready.
-  var list, loading, logo, markup, page_picker, template;
+  var body, list, loading, logo, markup, page_picker, template;
 
   // Private variables used as "constants".
-  var $ = typeof Zepto === 'function' ? Zepto : jQuery;
   var cache = window.localStorage ? window.localStorage : {};
   var base = 'http://api.dribbble.com/shots/popular?per_page=30&page=';
   var search = window.location.search;
@@ -33,6 +37,7 @@ var APP = (function(window, document, undefined) {
       // APP.init.assign_dom_vars
       assign_dom_vars: function() {
         // Assigned when DOM is ready.
+        body = $(document.body);
         logo = $('#logo')[0];
         page_picker = $('#page_picker');
         list = $('#list');
@@ -48,9 +53,42 @@ var APP = (function(window, document, undefined) {
       },
       // APP.init.page_picker
       page_picker: function() {
-        page_picker.change(function() {
+        page_picker.on('change', function() {
           logo.href = './index.html?page=' + this.value;
           APP.util.load_api_page(this.value);
+        });
+      },
+      // APP.init.nav_shortcuts
+      nav_shortcuts: function() {
+        // Logic to determine prev/next
+        // page, or go to beginning/end.
+        function change_page(goto) {
+          goto === 'prev' ? number-- : number++;
+          number > 25 && (number = 1);
+          number < 1 && (number = 25);
+          APP.init.set_page_number();
+        }
+
+        // Watch for swipes.
+        body.on('swipeLeft', function() {
+          loading[0].style.display === 'none' && change_page('next');
+          return false;
+        }).on('swipeRight', function() {
+          loading[0].style.display === 'none' && change_page('prev');
+          return false;
+
+        // Watch for "J" or "K" pressed.
+        }).on('keydown', function(ev) {
+          switch (ev.keyCode) {
+            case 74:
+              ev.preventDefault();
+              loading[0].style.display === 'none' && change_page('prev');
+              break;
+            case 75:
+              ev.preventDefault();
+              loading[0].style.display === 'none' && change_page('next');
+              break;
+          }
         });
       }
     },
@@ -116,12 +154,5 @@ var APP = (function(window, document, undefined) {
       }
     }
   };
-// Alias window, document.
-})(this, this.document);
-
-//
-// Automatically calls all functions in APP.init
-//
-(typeof Zepto === 'function' ? Zepto : jQuery)(this.document).ready(function() {
-  APP.go();
-});
+// Parameters: Zepto/jQuery, window, document.
+})(typeof Zepto === 'function' ? Zepto : jQuery, this, this.document);
