@@ -59,7 +59,13 @@
     <li>
       <p>
         <b class="big">{{title}}</b>
-        <img style="background-image:url({{image_url}})" src="./assets/images/spacer.png" alt="{{title}}" class="frame" />
+        <!--[if lte IE 9]>
+          <img alt="{{title}}" class="frame" style="background-image:url({{image_url}})" src="./assets/images/spacer.png" />
+        <![endif]-->
+        <!--[if gt IE 9]><!-->
+          <img alt="{{title}}" class="frame" style="background-image:url({{image_url}})" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAEklEQVQIHWP8//8/AzJgJCgAAB+I
+CPuLaDnAAAAAAElFTkSuQmCC" />
+        <![endif]-->
       </p>
       <table>
         <tr>
