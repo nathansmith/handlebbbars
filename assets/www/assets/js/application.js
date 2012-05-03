@@ -160,7 +160,7 @@ var APP = (function($, window, document, undefined) {
 
                 // Custom attribute, to identify if browser
                 // is IE9. Used in the Handlebars template.
-                IE9 && (shot.IE9 = true);
+                shot.IE9 = IE9;
               });
 
               loading.hide();
