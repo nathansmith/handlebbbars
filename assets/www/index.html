@@ -64,63 +64,64 @@
   </a>
 </div>
 <script type="text/x-handlebars" id="_template-list-item">
-  {{#each shots}}
-    <li>
-      <p>
-        <b class="big">
-          {{title}}
-        </b>
-        <img alt="{{title}}" class="frame" style="background-image:url({{image_url}})" src="
-          {{#if IE9}}
-            ./assets/images/spacer.png
-          {{else}}
-            data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAEklEQVQIHWP8//8/AzJgJCgAAB+I
-CPuLaDnAAAAAAElFTkSuQmCC
+  {{#with shots}}
+    {{#each this}}
+      <li>
+        <p>
+          <b class="big">
+            {{title}}
+          </b>
+          <img alt="{{title}}" class="frame" style="background-image:url({{image_url}})" src="
+            {{#if ../IE9}}
+              ./assets/images/spacer.png
+            {{else}}
+              data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAEklEQVQIHWP8//8/AzJgJCgAAB+ICPuLaDnAAAAAAElFTkSuQmCC
+            {{/if}}
+          "/>
+        </p>
+        <table>
+          <tr>
+            <th>
+              Designer:
+            </th>
+            <td>
+              <b>{{player.name}}</b>
+            </td>
+          </tr>
+          {{#if player.twitter_screen_name}}
+            <tr>
+              <th>
+                Twitter:
+              </th>
+              <td>
+                <a target="_blank" href="http://twitter.com/{{player.twitter_screen_name}}">@{{player.twitter_screen_name}}</a>
+              </td>
+            </tr>
           {{/if}}
-        "/>
-      </p>
-      <table>
-        <tr>
-          <th>
-            Designer:
-          </th>
-          <td>
-            <b>{{player.name}}</b>
-          </td>
-        </tr>
-        {{#if player.twitter_screen_name}}
-          <tr>
-            <th>
-              Twitter:
-            </th>
-            <td>
-              <a target="_blank" href="http://twitter.com/{{player.twitter_screen_name}}">@{{player.twitter_screen_name}}</a>
-            </td>
-          </tr>
-        {{/if}}
-        {{#if likes_count}}
-          <tr>
-            <th>
-              Likes:
-            </th>
-            <td>
-              {{likes_count}} <span class="mute">&hearts;</span>
-            </td>
-          </tr>
-        {{/if}}
-        {{#if short_url}}
-          <tr>
-            <th>
-              URL:
-            </th>
-            <td>
-              <a target="_blank" href="{{short_url}}">{{short_url}}</a>
-            </td>
-          </tr>
-        {{/if}}
-      </table>
-    </li>
-  {{/each}}
+          {{#if likes_count}}
+            <tr>
+              <th>
+                Likes:
+              </th>
+              <td>
+                {{likes_count}} <span class="mute">&hearts;</span>
+              </td>
+            </tr>
+          {{/if}}
+          {{#if short_url}}
+            <tr>
+              <th>
+                URL:
+              </th>
+              <td>
+                <a target="_blank" href="{{short_url}}">{{short_url}}</a>
+              </td>
+            </tr>
+          {{/if}}
+        </table>
+      </li>
+    {{/each}}
+  {{/with}}
 </script>
 <!--[if gt IE 9]><!-->
   <script src="./assets/js/zepto.js"></script>
