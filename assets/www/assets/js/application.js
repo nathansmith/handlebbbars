@@ -1,5 +1,5 @@
 // JSLint settings:
-/*global alert, console, Handlebars, jQuery, Zepto*/
+/*global alert, clearTimeout, console, Handlebars, jQuery, setTimeout, Zepto*/
 
 // JS Module Pattern:
 // http://j.mp/module-pattern
@@ -11,8 +11,8 @@ var APP = (function($, window, document, undefined) {
     APP.go();
   });
 
-  // Empty vars. Assigned after DOM is ready.
-  var body, list, loading, logo, markup, page_picker, template;
+  // Empty vars. Some assigned after DOM is ready.
+  var body, error, error_link, error_timer, list, loading, logo, markup, page_picker, template;
 
   // Private variables used as "constants".
   var cache = window.localStorage ? window.localStorage : {};
@@ -20,6 +20,16 @@ var APP = (function($, window, document, undefined) {
   var search = window.location.search;
   var number = search ? search.split('?page=')[1] : 1;
   var one_hour = 3600000;
+  var ten_seconds = 10000;
+
+  // Internet Explorer detection.
+  function IE(version) {
+    var b = document.createElement('b');
+    b.innerHTML = '<!--[if IE ' + version + ']><br><![endif]-->';
+    return !!b.getElementsByTagName('br').length;
+  }
+
+  var IE9 = IE(9);
 
   // Expose contents of APP.
   return {
@@ -42,19 +52,21 @@ var APP = (function($, window, document, undefined) {
         page_picker = $('#page_picker');
         list = $('#list');
         loading = $('#loading');
+        error = $('#error');
+        error_link = error.find('a')[0];
         markup = $('#_template-list-item').html().replace(/\s\s+/g, '');
         template = Handlebars.compile(markup);
       },
       // APP.init.set_page_number
       set_page_number: function() {
-        logo.href = './index.html?page=' + number;
+        logo.href = error_link.href = './index.html?page=' + number;
         page_picker.val(number);
         APP.util.load_api_page(number);
       },
       // APP.init.page_picker
       page_picker: function() {
         page_picker.on('change', function() {
-          logo.href = './index.html?page=' + this.value;
+          logo.href = error_link.href = './index.html?page=' + this.value;
           APP.util.load_api_page(this.value);
         });
       },
@@ -63,6 +75,7 @@ var APP = (function($, window, document, undefined) {
         // Logic to determine prev/next
         // page, or go to beginning/end.
         function change_page(goto) {
+          clearTimeout(error_timer);
           goto === 'prev' ? number-- : number++;
           number > 25 && (number = 1);
           number < 1 && (number = 25);
@@ -101,6 +114,7 @@ var APP = (function($, window, document, undefined) {
         var time_now = Date.now();
 
         list.html('');
+        error.hide();
         loading.show();
 
         if (cache[url_key] && time_now - cache[time_key] < one_hour) {
@@ -150,6 +164,15 @@ var APP = (function($, window, document, undefined) {
               list.html(cache[url_key]);
             }
           });
+
+          // Poor man's error callback, because
+          // there's no error condition for JSONP.
+          error_timer = setTimeout(function() {
+            if (loading[0].style.display !== 'none') {
+              loading.hide();
+              error.show();
+            }
+          }, ten_seconds);
         }
       }
     }
