@@ -157,13 +157,11 @@ var APP = (function($, window, document, undefined) {
 
                   shot.player.twitter_screen_name = username.replace(/\@/g, '');
                 }
-              });
 
-              // Custom attribute, to identify if browser
-              // is IE9. Used in the Handlebars template.
-              if (IE9) {
-                data.shots.IE9 = true;
-              }
+                // Custom attribute, to identify if browser
+                // is IE9. Used in the Handlebars template.
+                IE9 && (shot.IE9 = true);
+              });
 
               loading.hide();
               cache[time_key] = time_now;
