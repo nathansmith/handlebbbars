@@ -12,13 +12,12 @@ var APP = (function($, window, document, undefined) {
   });
 
   // Empty vars. Some assigned after DOM is ready.
-  var body, error, error_link, error_timer, list, loading, logo, markup, page_picker, template;
+  var body, error, error_link, error_timer, hash, list, loading, logo, markup, number, page_picker, template;
 
   // Private variables used as "constants".
   var cache = window.localStorage ? window.localStorage : {};
   var base = 'http://api.dribbble.com/shots/popular?per_page=30&page=';
-  var search = window.location.search;
-  var number = search ? search.split('?page=')[1] : 1;
+  var slug = '#!/page/';
   var one_hour = 3600000;
   var ten_seconds = 10000;
 
@@ -49,26 +48,45 @@ var APP = (function($, window, document, undefined) {
       assign_dom_vars: function() {
         // Assigned when DOM is ready.
         body = $(document.body);
-        logo = $('#logo')[0];
-        page_picker = $('#page_picker');
+        page_picker = $('#page-picker');
         list = $('#list');
         loading = $('#loading');
         error = $('#error');
-        error_link = error.find('a')[0];
         markup = $('#_template-list-item').html().replace(/\s\s+/g, '');
         template = Handlebars.compile(markup);
       },
-      // APP.init.set_page_number
-      set_page_number: function() {
-        logo.href = error_link.href = './index.html?page=' + number;
-        page_picker.val(number);
-        APP.util.load_api_page(number);
+      // APP.init.watch_hash_change
+      watch_hash_change: function() {
+        $(window).on('hashchange', function() {
+          APP.init.set_the_page();
+        });
+      },
+      // APP.init.set_the_page
+      set_the_page: function() {
+        hash = window.location.hash;
+        number = hash.split(slug)[1] || 1;
+
+        if (hash.match(slug) && 0 < number && number < 26) {
+          APP.util.load_from_api();
+          page_picker.val(number);
+        }
+        else {
+          number = 1;
+          APP.util.change_hash();
+        }
+      },
+      // APP.init.refresh_links
+      refresh_links: function() {
+        body.on('click', '#logo, #error a', function() {
+          window.history.go(0);
+          return false;
+        });
       },
       // APP.init.page_picker
       page_picker: function() {
         page_picker.on('change', function() {
-          logo.href = error_link.href = './index.html?page=' + this.value;
-          APP.util.load_api_page(this.value);
+          number = this.value;
+          APP.util.change_hash();
         });
       },
       // APP.init.nav_shortcuts
@@ -80,7 +98,7 @@ var APP = (function($, window, document, undefined) {
           goto === 'prev' ? number-- : number++;
           number > 25 && (number = 1);
           number < 1 && (number = 25);
-          APP.init.set_page_number();
+          APP.util.change_hash();
         }
 
         // Watch for swipes.
@@ -108,10 +126,14 @@ var APP = (function($, window, document, undefined) {
     },
     // APP.util
     util: {
-      // APP.util.load_api_page
-      load_api_page: function(page) {
-        var url_key = base + page;
-        var time_key = 'time_' + page;
+      // APP.util.change_hash
+      change_hash: function() {
+        window.location.hash = slug + number;
+      },
+      // APP.util.load_from_api
+      load_from_api: function() {
+        var url_key = base + number;
+        var time_key = 'time_' + number;
         var time_now = Date.now();
 
         list.html('');
