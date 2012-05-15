@@ -36,16 +36,6 @@ var APP = (function($, window, document, undefined) {
   var ten_seconds = 10000;
   var is_touch_device = !!('ontouchstart' in window);
 
-  // Internet Explorer detection.
-  function IE(version) {
-    var b = document.createElement('b');
-    b.innerHTML = '<!--[if IE ' + version + ']><br><![endif]-->';
-    return !!b.getElementsByTagName('br').length;
-  }
-
-  // Identify Internet Explorer 9.
-  var IE9 = IE(9);
-
   // Expose contents of APP.
   return {
     // APP.go
@@ -209,10 +199,6 @@ var APP = (function($, window, document, undefined) {
                   shot.player.twitter_screen_name = username.replace(/\@/g, '');
                 }
               });
-
-              // Custom attribute, to identify if browser
-              // is IE9. Used in the Handlebars template.
-              data.shots.IE9 = IE9;
 
               loading.hide();
               error.hide();
