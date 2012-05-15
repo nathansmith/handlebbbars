@@ -68,9 +68,6 @@ var APP = (function($, window, document, undefined) {
         // Show relevant instructions.
         is_touch_device ? for_touch.show() : for_keyboard.show();
 
-        // Show tip with correct instructions.
-        tip.show();
-
         // Logic to determine prev/next
         // page, or go to beginning/end.
         function change_page(goto) {
@@ -127,7 +124,10 @@ var APP = (function($, window, document, undefined) {
       // APP.init.refresh_links
       refresh_links: function() {
         body.on('click', '#logo, #error a', function() {
-          window.history.go(0);
+          // Force whole page to be reloaded.
+          // But allow it to load from cache,
+          // by passing in 'false' parameter.
+          window.location.reload(false);
           return false;
         });
       },
