@@ -1,5 +1,5 @@
 // JSLint settings:
-/*global alert, clearTimeout, console, Handlebars, jQuery, setTimeout, Zepto*/
+/*global alert, console, Handlebars, jQuery, Zepto*/
 
 // JS Module Pattern:
 // http://j.mp/module-pattern
@@ -12,14 +12,29 @@ var APP = (function($, window, document, undefined) {
   });
 
   // Empty vars. Some assigned after DOM is ready.
-  var body, error, error_link, error_timer, hash, list, loading, logo, markup, number, page_picker, template;
+  var body,
+      error,
+      error_link,
+      error_timer,
+      for_keyboard,
+      for_touch,
+      hash,
+      list,
+      loading,
+      logo,
+      markup,
+      tip,
+      number,
+      page_picker,
+      template;
 
   // Private variables used as "constants".
   var cache = window.localStorage ? window.localStorage : {};
   var base = 'http://api.dribbble.com/shots/popular?per_page=30&page=';
-  var slug = '#!/page/';
+  var slug = '#/page/';
   var one_hour = 3600000;
   var ten_seconds = 10000;
+  var is_touch_device = !!('ontouchstart' in window);
 
   // Internet Explorer detection.
   function IE(version) {
@@ -54,6 +69,9 @@ var APP = (function($, window, document, undefined) {
         error = $('#error');
         markup = $('#_template-list-item').html().replace(/\s\s+/g, '');
         template = Handlebars.compile(markup);
+        tip = $('#tip');
+        for_keyboard = tip.find('.for-keyboard');
+        for_touch = tip.find('.for-touch');
       },
       // APP.init.watch_hash_change
       watch_hash_change: function() {
@@ -91,10 +109,14 @@ var APP = (function($, window, document, undefined) {
       },
       // APP.init.nav_shortcuts
       nav_shortcuts: function() {
+        // Show relevant instructions.
+        is_touch_device ? for_touch.show() : for_keyboard.show();
+
         // Logic to determine prev/next
         // page, or go to beginning/end.
         function change_page(goto) {
-          clearTimeout(error_timer);
+          window.clearTimeout(error_timer);
+          tip.hide();
           goto === 'prev' ? number-- : number++;
           number > 25 && (number = 1);
           number < 1 && (number = 25);
@@ -121,6 +143,13 @@ var APP = (function($, window, document, undefined) {
               loading[0].style.display === 'none' && change_page('next');
               break;
           }
+        });
+      },
+      external_links: function() {
+        body.on('click', 'a', function() {
+          var el = $(this);
+
+          el.attr('href').match(/^http:|^https:/) && el.attr('target', '_blank');
         });
       }
     },
@@ -195,7 +224,7 @@ var APP = (function($, window, document, undefined) {
 
           // Poor man's error callback, because
           // there's no error condition for JSONP.
-          error_timer = setTimeout(function() {
+          error_timer = window.setTimeout(function() {
             if (loading[0].style.display !== 'none') {
               loading.hide();
               error.show();

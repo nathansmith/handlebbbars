@@ -41,15 +41,25 @@
     </a>
   </header>
   <div role="main">
+    <aside id="tip">
+      <b>Tip:</b>
+      <span class="for-keyboard">
+        Press <b>J</b> or <b>K</b>
+      </span>
+      <span class="for-touch">
+        Swipe left/right
+      </span>
+      to navigate.
+    </aside>
     <ul id="list">
       <!-- Insert fancy content here. -->
     </ul>
   </div>
 </div>
 <footer role="contentinfo">
-  Built by <a target="_blank" href="http://sonspring.com/">Nathan Smith</a>
+  Built by <a href="http://sonspring.com/">Nathan Smith</a>
   &mdash;
-  Twitter: <a target="_blank" href="http://twitter.com/nathansmith">@nathansmith</a>
+  Twitter: <a href="http://twitter.com/nathansmith">@nathansmith</a>
 </footer>
 <div id="loading">
   loading&hellip;
@@ -94,7 +104,7 @@
                 Twitter:
               </th>
               <td>
-                <a target="_blank" href="http://twitter.com/{{player.twitter_screen_name}}">@{{player.twitter_screen_name}}</a>
+                <a href="http://twitter.com/{{player.twitter_screen_name}}">@{{player.twitter_screen_name}}</a>
               </td>
             </tr>
           {{/if}}
@@ -114,7 +124,7 @@
                 URL:
               </th>
               <td>
-                <a target="_blank" href="{{short_url}}">{{short_url}}</a>
+                <a href="{{short_url}}">{{short_url}}</a>
               </td>
             </tr>
           {{/if}}

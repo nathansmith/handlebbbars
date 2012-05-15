@@ -76,6 +76,22 @@ a
 div[role="main"]
   padding-bottom: 50px
 
+// `Tip (Nav Instructions)
+//----------------------------------------------------------------------------------------------------
+
+#tip
+  background: #ffd
+  border-bottom: 1px solid #ccc
+  font-size: 16px
+  margin-bottom: -1px
+  line-height: 40px
+  height: 40px
+  text-align: center
+  white-space: nowrap
+
+#tip span[class^="for-"]
+  display: none
+
 // `Header & Footer
 //----------------------------------------------------------------------------------------------------
 
@@ -128,9 +144,6 @@ footer[role="contentinfo"] a
   overflow: hidden
   padding: 20px 20px 0
 
-#list li:first-child
-  border-top: 0
-
 // `Image Frame
 //----------------------------------------------------------------------------------------------------
 
@@ -178,12 +191,6 @@ th
     width: 400px
     height: 36em
 
-  #list li:first-child + li
-    border-top: 0
-
 @media (min-width: 1320px)
   body
     width: 1320px
-
-  #list li:first-child + li + li
-    border-top: 0
