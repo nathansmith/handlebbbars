@@ -41,7 +41,7 @@ a
   color: #ccc
   font-size: 25px
   line-height: 40px
-  margin-top: -20px
+  margin-top: 5px
   text-align: center
   text-shadow: none
   position: absolute
@@ -49,19 +49,23 @@ a
   left: 0
   right: 0
 
+.hide_tip #loading
+  margin-top: -10px
+
 // `Error
 //----------------------------------------------------------------------------------------------------
 
 #error
   display: none
-  line-height: 2
   font-size: 16px
-  margin-top: -35px
   text-align: center
   position: absolute
   top: 50%
   left: 0
   right: 0
+
+.hide_tip #error
+  margin-top: -15px
 
 #error i
   color: #c33
@@ -74,7 +78,7 @@ a
   min-height: 100%
 
 div[role="main"]
-  padding-bottom: 50px
+  padding-bottom: 30px
 
 // `Tip (Nav Instructions)
 //----------------------------------------------------------------------------------------------------
@@ -82,13 +86,14 @@ div[role="main"]
 #tip
   background: #ffd
   border-bottom: 1px solid #ccc
-  font-size: 16px
+  font-size: 11px
   margin-bottom: -1px
-  line-height: 40px
-  height: 40px
+  line-height: 30px
+  height: 30px
   text-align: center
   white-space: nowrap
 
+.hide_tip #tip,
 #tip span[class^="for-"]
   display: none
 
@@ -100,9 +105,11 @@ footer[role="contentinfo"]
   background-color: #444
   +background-image(linear-gradient(#666, #333))
   color: #fff
-  line-height: 50px
   overflow: hidden
   text-shadow: #000 0 -1px 0
+
+header[role="banner"]
+  line-height: 50px
   height: 50px
 
 header[role="banner"] img
@@ -120,8 +127,10 @@ header[role="banner"] select
 
 footer[role="contentinfo"]
   font-size: 11px
-  margin-top: -50px
+  margin-top: -30px
   text-align: center
+  line-height: 30px
+  height: 30px
 
 footer[role="contentinfo"] a
   color: #fff

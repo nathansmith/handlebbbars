@@ -63,6 +63,47 @@ var APP = (function($, window, document, undefined) {
         for_keyboard = tip.find('.for-keyboard');
         for_touch = tip.find('.for-touch');
       },
+      // APP.init.nav_shortcuts
+      nav_shortcuts: function() {
+        // Show relevant instructions.
+        is_touch_device ? for_touch.show() : for_keyboard.show();
+
+        // Show tip with correct instructions.
+        tip.show();
+
+        // Logic to determine prev/next
+        // page, or go to beginning/end.
+        function change_page(goto) {
+          window.clearTimeout(error_timer);
+          body.addClass('hide_tip');
+          goto === 'prev' ? number-- : number++;
+          number > 25 && (number = 1);
+          number < 1 && (number = 25);
+          APP.util.change_hash();
+        }
+
+        // Watch for swipes.
+        body.on('swipeLeft', function() {
+          loading[0].style.display === 'none' && change_page('next');
+          return false;
+        }).on('swipeRight', function() {
+          loading[0].style.display === 'none' && change_page('prev');
+          return false;
+
+        // Watch for "J" or "K" pressed.
+        }).on('keydown', function(ev) {
+          switch (ev.keyCode) {
+            case 74:
+              ev.preventDefault();
+              loading[0].style.display === 'none' && change_page('prev');
+              break;
+            case 75:
+              ev.preventDefault();
+              loading[0].style.display === 'none' && change_page('next');
+              break;
+          }
+        });
+      },
       // APP.init.watch_hash_change
       watch_hash_change: function() {
         $(window).on('hashchange', function() {
@@ -95,44 +136,6 @@ var APP = (function($, window, document, undefined) {
         page_picker.on('change', function() {
           number = this.value;
           APP.util.change_hash();
-        });
-      },
-      // APP.init.nav_shortcuts
-      nav_shortcuts: function() {
-        // Show relevant instructions.
-        is_touch_device ? for_touch.show() : for_keyboard.show();
-
-        // Logic to determine prev/next
-        // page, or go to beginning/end.
-        function change_page(goto) {
-          window.clearTimeout(error_timer);
-          tip.hide();
-          goto === 'prev' ? number-- : number++;
-          number > 25 && (number = 1);
-          number < 1 && (number = 25);
-          APP.util.change_hash();
-        }
-
-        // Watch for swipes.
-        body.on('swipeLeft', function() {
-          loading[0].style.display === 'none' && change_page('next');
-          return false;
-        }).on('swipeRight', function() {
-          loading[0].style.display === 'none' && change_page('prev');
-          return false;
-
-        // Watch for "J" or "K" pressed.
-        }).on('keydown', function(ev) {
-          switch (ev.keyCode) {
-            case 74:
-              ev.preventDefault();
-              loading[0].style.display === 'none' && change_page('prev');
-              break;
-            case 75:
-              ev.preventDefault();
-              loading[0].style.display === 'none' && change_page('next');
-              break;
-          }
         });
       },
       external_links: function() {
