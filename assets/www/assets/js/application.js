@@ -92,6 +92,11 @@ var APP = (function(window, undefined) {
       },
       // APP.init.nav_shortcuts
       nav_shortcuts: function() {
+        // Events.
+        var swipeLeft = 'swipeLeft.app_init_nav_shortcuts';
+        var swipeRight = 'swipeRight.app_init_nav_shortcuts';
+        var keydown = 'keydown.app_init_nav_shortcuts';
+
         // Show relevant instructions.
         if (is_touch_device) {
           for_touch.show();
@@ -125,10 +130,8 @@ var APP = (function(window, undefined) {
           APP.util.change_hash();
         }
 
-        var swipeLeft = 'swipeLeft.app_init_nav_shortcuts';
-
         // Watch for swipes.
-        body.on('swipeLeft', function(e) {
+        body.off(swipeLeft).on(swipeLeft, function(e) {
           e.preventDefault();
 
           var is_hidden = loading[0].style.display === 'none';
@@ -138,7 +141,7 @@ var APP = (function(window, undefined) {
           }
         });
 
-        body.on('swipeRight', function(e) {
+        body.off(swipeRight).on(swipeRight, function(e) {
           e.preventDefault();
 
           var is_hidden = loading[0].style.display === 'none';
@@ -149,7 +152,7 @@ var APP = (function(window, undefined) {
         });
 
         // Watch for "J" or "K" pressed.
-        body.on('keydown', function(e) {
+        body.off(keydown).on(keydown, function(e) {
           var key = e.keyCode;
           var is_hidden = loading[0].style.display === 'none';
           var prev = is_hidden && key === 74;
@@ -189,7 +192,9 @@ var APP = (function(window, undefined) {
       },
       // APP.init.refresh_links
       refresh_links: function() {
-        body.on('click', '#logo, #error a', function(e) {
+        var event = 'click.app_init_refresh_links';
+
+        body.off(event).on(event, '#logo, #error a', function(e) {
           e.preventDefault();
 
           // Force whole page to be reloaded.
