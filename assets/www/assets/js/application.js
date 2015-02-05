@@ -1,34 +1,55 @@
-// JSLint settings:
-/*global alert, console, Handlebars, jQuery, Zepto*/
+/*
+  JS Module Pattern:
 
-// JS Module Pattern:
-// http://j.mp/module-pattern
+  http://j.mp/module-pattern
+*/
+var APP = (function(window, undefined) {
+  'use strict';
 
-// Redefine: $, window, document, undefined.
-var APP = (function($, window, document, undefined) {
+  //===============================
+  // Local aliases to global scope.
+  //===============================
+
+  var $ =
+    typeof window.Zepto === 'function' ?
+    window.Zepto :
+    window.jQuery;
+
+  var document = window.document;
+  var Handlebars = window.Handlebars;
+
+  //========================================
   // Fire things off, once the DOM is ready.
+  //========================================
+
   $(document).ready(function() {
     APP.go();
   });
 
+  //==============================================
   // Empty vars. Some assigned after DOM is ready.
-  var body,
-      error,
-      error_link,
-      error_timer,
-      for_keyboard,
-      for_touch,
-      hash,
-      list,
-      loading,
-      logo,
-      markup,
-      tip,
-      number,
-      page_picker,
-      template;
+  //==============================================
 
-  // Private variables used as "constants".
+  var body;
+  var error;
+  var error_link;
+  var error_timer;
+  var for_keyboard;
+  var for_touch;
+  var hash;
+  var list;
+  var loading;
+  var logo;
+  var markup;
+  var tip;
+  var number;
+  var page_picker;
+  var template;
+
+  //==============
+  // Shared scope.
+  //==============
+
   var cache = window.localStorage ? window.localStorage : {};
   var base = 'http://api.dribbble.com/shots/popular?per_page=30&page=';
   var slug = '#/page/';
@@ -40,25 +61,31 @@ var APP = (function($, window, document, undefined) {
   return {
     // APP.go
     go: function() {
-      var i, j = this.init;
+      var i;
+      var x = APP.init;
 
-      for (i in j) {
-        // Run everything in APP.init
-        j.hasOwnProperty(i) && j[i]();
+      // Run everything in APP.init
+      for (i in x) {
+        if (x.hasOwnProperty(i)) {
+          x[i]();
+        }
       }
     },
     // APP.init
     init: {
       // APP.init.assign_dom_vars
       assign_dom_vars: function() {
-        // Assigned when DOM is ready.
         body = $(document.body);
+
         page_picker = $('#page-picker');
         list = $('#list');
+
         loading = $('#loading');
         error = $('#error');
+
         markup = $('#_template-list-item').html().replace(/\s\s+/g, '');
         template = Handlebars.compile(markup);
+
         tip = $('#tip');
         for_keyboard = tip.find('.for-keyboard');
         for_touch = tip.find('.for-touch');
@@ -66,44 +93,83 @@ var APP = (function($, window, document, undefined) {
       // APP.init.nav_shortcuts
       nav_shortcuts: function() {
         // Show relevant instructions.
-        is_touch_device ? for_touch.show() : for_keyboard.show();
+        if (is_touch_device) {
+          for_touch.show();
+        }
+        else {
+          for_keyboard.show();
+        }
 
         // Logic to determine prev/next
         // page, or go to beginning/end.
         function change_page(goto) {
           window.clearTimeout(error_timer);
           body.addClass('hide_tip');
-          goto === 'prev' ? number-- : number++;
-          number > 25 && (number = 1);
-          number < 1 && (number = 25);
+
+          // Previous or next?
+          if (goto === 'prev') {
+            number--;
+          }
+          else {
+            number++;
+          }
+
+          // Circular navigation.
+          if (number > 25) {
+            number = 1;
+          }
+          else if (number < 1) {
+            number = 25;
+          }
+
           APP.util.change_hash();
         }
 
+        var swipeLeft = 'swipeLeft.app_init_nav_shortcuts';
+
         // Watch for swipes.
-        body.on('swipeLeft', function() {
-          loading[0].style.display === 'none' && change_page('next');
-          return false;
-        }).on('swipeRight', function() {
-          loading[0].style.display === 'none' && change_page('prev');
-          return false;
+        body.on('swipeLeft', function(e) {
+          e.preventDefault();
+
+          var is_hidden = loading[0].style.display === 'none';
+
+          if (is_hidden) {
+            change_page('next');
+          }
+        });
+
+        body.on('swipeRight', function(e) {
+          e.preventDefault();
+
+          var is_hidden = loading[0].style.display === 'none';
+
+          if (is_hidden) {
+            change_page('prev');
+          }
+        });
 
         // Watch for "J" or "K" pressed.
-        }).on('keydown', function(ev) {
-          switch (ev.keyCode) {
-            case 74:
-              ev.preventDefault();
-              loading[0].style.display === 'none' && change_page('prev');
-              break;
-            case 75:
-              ev.preventDefault();
-              loading[0].style.display === 'none' && change_page('next');
-              break;
+        body.on('keydown', function(e) {
+          var key = e.keyCode;
+          var is_hidden = loading[0].style.display === 'none';
+          var prev = is_hidden && key === 74;
+          var next = is_hidden && key === 75;
+
+          if (prev) {
+            e.preventDefault();
+            change_page('prev');
+          }
+          else if (next) {
+            e.preventDefault();
+            change_page('next');
           }
         });
       },
       // APP.init.watch_hash_change
       watch_hash_change: function() {
-        $(window).on('hashchange', function() {
+        var event = 'hashchange.app_init_watch_hash_change';
+
+        $(window).off(event).on(event, function() {
           APP.init.set_the_page();
         });
       },
@@ -123,26 +189,36 @@ var APP = (function($, window, document, undefined) {
       },
       // APP.init.refresh_links
       refresh_links: function() {
-        body.on('click', '#logo, #error a', function() {
+        body.on('click', '#logo, #error a', function(e) {
+          e.preventDefault();
+
           // Force whole page to be reloaded.
           // But allow it to load from cache,
           // by passing in 'false' parameter.
           window.location.reload(false);
-          return false;
         });
       },
       // APP.init.page_picker
       page_picker: function() {
-        page_picker.on('change', function() {
+        var event = 'change.app_init_page_picker';
+
+        page_picker.off(event).on(event, function() {
           number = this.value;
           APP.util.change_hash();
         });
       },
+      // APP.init.external_links
       external_links: function() {
-        body.on('click', 'a', function() {
-          var el = $(this);
+        var event = 'click.app_init_external_links';
 
-          el.attr('href').match(/^http:|^https:/) && el.attr('target', '_blank');
+        var str = [
+          'a[href^="http://"]',
+          'a[href^="https://"]'
+        ].join(',');
+
+        body.off(event).on(event, str, function() {
+          var el = $(this);
+          el.attr('target', '_blank');
         });
       }
     },
@@ -158,11 +234,15 @@ var APP = (function($, window, document, undefined) {
         var time_key = 'time_' + number;
         var time_now = Date.now();
 
+        var valid_cache =
+          cache[url_key] &&
+          time_now - cache[time_key] < one_hour;
+
         list.html('');
         error.hide();
         loading.show();
 
-        if (cache[url_key] && time_now - cache[time_key] < one_hour) {
+        if (valid_cache) {
           loading.hide();
           list.html(cache[url_key]);
         }
@@ -170,7 +250,7 @@ var APP = (function($, window, document, undefined) {
           $.ajax({
             url: url_key,
             type: 'get',
-            async: false,
+            async: true,
             cache: true,
             callback: 'process_json',
             contentType: 'application/json',
@@ -214,7 +294,9 @@ var APP = (function($, window, document, undefined) {
           // Poor man's error callback, because
           // there's no error condition for JSONP.
           error_timer = window.setTimeout(function() {
-            if (loading[0].style.display !== 'none') {
+            var is_visible = loading[0].style.display === 'block';
+
+            if (is_visible) {
               loading.hide();
               error.show();
             }
@@ -223,5 +305,6 @@ var APP = (function($, window, document, undefined) {
       }
     }
   };
-// Parameters: Zepto/jQuery, window, document.
-})(typeof Zepto === 'function' ? Zepto : jQuery, this, this.document);
+
+// END: closure.
+})(this);
